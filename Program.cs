@@ -11,6 +11,7 @@ builder.Services
   
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddHealthChecks();
 builder.AddLoggingServices();
 
 builder.Services.AddAuthServices(builder.Environment);
@@ -25,3 +26,6 @@ app
 app.MapGet("/", () => "Hello World!");
 
 app.Run();
+app.MapHealthChecks("/health")
+  .RequireAuthorization(ApiBuilder.AuthConstants.Policies.MrAwesome)
+  .RequireRateLimiting(ApiBuilder.RateLimit.Policies.Fixed);
