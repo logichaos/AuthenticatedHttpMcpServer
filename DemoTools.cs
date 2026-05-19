@@ -1,5 +1,7 @@
 using System.ComponentModel;
+
 using Microsoft.AspNetCore.Authorization;
+
 using ModelContextProtocol.Server;
 
 namespace AuthenticatedHttpMcpServer;
@@ -17,9 +19,7 @@ public class DemoTools
   [McpServerTool, Description("Says hello to the given name")]
   public string HelloWorld(string name = "world")
   {
-    var user  = _http.HttpContext?.User;
+    var user = _http.HttpContext?.User;
     return $"Hello, {name}({user?.Identity?.Name ?? "anonymous"}) from your MCP server";
   }
 }
-
-
