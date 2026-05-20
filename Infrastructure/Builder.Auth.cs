@@ -43,7 +43,7 @@ public static partial class ApiBuilder
         }
         else
         {
-          options.Authority = $"https://login.microsoftonline.com/{"myentraid"}/v2.0";
+          options.Authority = $"https://login.microsoftonline.com/{GlobalConfigurations.ApiSettings?.EntraId?.TenantId ?? "entraid"}/v2.0";
         }
 
         options.Events = new JwtBearerEvents

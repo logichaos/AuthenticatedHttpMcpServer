@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
-using System.Security.Claims;
+
+using AuthenticatedHttpMcpServer.Infrastructure.ToolSelection;
 
 using ModelContextProtocol.Server;
 
@@ -37,17 +38,8 @@ public sealed class McpToolRegistry
     }
   }
 
-  public IList<McpServerTool> GetToolsForClaimsPrincipal(ClaimsPrincipal user)
+  public IEnumerable<McpServerTool> GetToolsForClaimsPrincipal(HttpContext ctx, HttpContextToolSelectionStrategy strategy)
   {
-    var userTools = new List<McpServerTool>();
-    foreach (var tool in AllTools)
-    {
-      if(user.HasClaim("scope", $"tool:{tool.ProtocolTool.Name}"))
-        userTools.Add(tool);
-    }
-
-    return userTools;
-      
-    //return AllTools.Where(tool => user.HasClaim("Tool", tool.ProtocolTool.Name)).ToList();
+    return strategy.GetTools(ctx, AllTools);
   }
 }

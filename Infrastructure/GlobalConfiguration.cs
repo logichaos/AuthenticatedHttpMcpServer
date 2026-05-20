@@ -11,13 +11,21 @@ internal static class GlobalConfigurations
 
 internal class SettingsModel
 {
-  public required TokenValidationParameters TokenValidation { get; set; }
-  public required FixedWindowRateLimiterOptions FixedWindowRateLimit { get; set; }
-  public required HybridCacheEntryOptions Cache { get; set; }
-  public ToolExposureSettings? ToolExposure { get; set; }
+  public required TokenValidationParameters TokenValidation { get; init; }
+  public required FixedWindowRateLimiterOptions FixedWindowRateLimit { get; init; }
+  public required HybridCacheEntryOptions Cache { get; init; }
+  public ToolExposureSettings? ToolExposure { get; init; }
+  public EntraIdOptions? EntraId { get; set; }
 }
 
 internal class ToolExposureSettings
 {
   public IList<string>? BlockedTools { get; set; }
+}
+
+internal class EntraIdOptions
+{
+  public string? TenantId { get; set; }
+  public string? ClientId { get; set; }
+  public string? ClientSecret { get; set; }
 }
