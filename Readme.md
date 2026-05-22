@@ -41,7 +41,14 @@ The second goal is to make a base structure for an MCP server that can be used b
   - in the future, I will attempt to play around with some other options
     - so far, my intended use for this is an MCP server that I don't think will be/should be called so much, but adding a rate limit sounded like a sane thing to do for something that might be exposed to the internet, or in a network with malicious actors
 
-- I added a means of exposing specific tools to a user, using scopes. So far it only works for JWT and is still a work in progress
+- Per session tool filtering using strategies
+  - You can register as many ToolSelectionStrategy services as you need. They will be injected in the MCP registration code and used to filter the McpToolRegistry
+  - There are 2 strategies implemented
+    - A stragety using scope claims (this way an external entity, the one creating the tokens, can decide what someone is allowed to use)
+      - here you can add as many scope claims with value "tool:<insert tool name here>", they will be used  to filter the incoming list
+    - A strategy using ToolsSelectionOptions in the appsettings (this way the owner of the server, can decide what tools are exposed)
+      - here you can set an array of "AllowedTools" inside the appsettings file
+  - All registered implementations will be used to filter the list, the result will be only the subset of tools allowed by all strategies
 
 #### Explanation
 
