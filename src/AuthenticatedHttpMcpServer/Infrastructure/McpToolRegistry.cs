@@ -33,10 +33,13 @@ public sealed class McpToolRegistry(IServiceProvider services)
     return allTools.AsReadOnly();
   }
 
-  public IEnumerable<McpServerTool> GetToolsForClaimsPrincipal(HttpContext ctx,
-    HttpContextToolSelectionStrategy strategy)
+  public IEnumerable<McpServerTool> FilterToolsUsingStrategy(IEnumerable<ToolSelectionStrategy> strategies)
   {
     IReadOnlyCollection<McpServerTool> demoTools = GetToolsFromClass<DemoTools>();
-    return strategy.FilterToolsWithStrategy([.. demoTools], ctx);
+
+    IEnumerable<McpServerTool> finalSelection = [..demoTools];
+    foreach(var strategy in strategies)
+      finalSelection = strategy.FilterTools(finalSelection);
+    return finalSelection;
   }
 }

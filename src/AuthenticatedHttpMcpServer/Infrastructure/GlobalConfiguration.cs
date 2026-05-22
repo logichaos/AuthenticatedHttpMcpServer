@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using AuthenticatedHttpMcpServer.Infrastructure.ToolSelection;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,6 +17,7 @@ internal class SettingsModel
   public required HybridCacheEntryOptions Cache { get; init; }
   public ToolExposureSettings? ToolExposure { get; init; }
   public EntraIdOptions? EntraId { get; set; }
+  public ToolsSelectionOptions? ToolsSelection { get; set; }
 }
 
 internal class ToolExposureSettings

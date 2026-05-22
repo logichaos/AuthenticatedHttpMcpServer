@@ -21,6 +21,12 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
             .ToArray();
     }
 
+    private static ScopeToolsClaimsPrincipalToolSelectionStrategy CreateSut(HttpContext ctx)
+    {
+        var accessor = new HttpContextAccessor { HttpContext = ctx };
+        return new ScopeToolsClaimsPrincipalToolSelectionStrategy(accessor);
+    }
+
     private static HttpContext ContextWithScopes(params string[] scopes)
     {
         var context = new DefaultHttpContext();
@@ -32,12 +38,10 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     private static List<string> ToolNames(IEnumerable<McpServerTool> tools) =>
         tools.Select(t => t.ProtocolTool.Name).ToList();
 
-    private readonly ScopeToolsClaimsPrincipalToolSelectionStrategy _sut = new();
-
     [Test]
     public async Task NoScopeClaims_ReturnsNoTools()
     {
-        var result = _sut.FilterToolsWithStrategy(AllTools, ContextWithScopes());
+        var result = CreateSut(ContextWithScopes()).FilterTools(AllTools);
 
         await Assert.That(result.Count()).IsEqualTo(0);
     }
@@ -45,7 +49,7 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     [Test]
     public async Task UnauthenticatedUser_ReturnsNoTools()
     {
-        var result = _sut.FilterToolsWithStrategy(AllTools, new DefaultHttpContext());
+        var result = CreateSut(new DefaultHttpContext()).FilterTools(AllTools);
 
         await Assert.That(result.Count()).IsEqualTo(0);
     }
@@ -53,7 +57,7 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     [Test]
     public async Task ToolAllScope_ReturnsEveryTool()
     {
-        var result = _sut.FilterToolsWithStrategy(AllTools, ContextWithScopes("tool:all")).ToList();
+        var result = CreateSut(ContextWithScopes("tool:all")).FilterTools(AllTools).ToList();
 
         await Assert.That(result.Count).IsEqualTo(AllTools.Count);
     }
@@ -61,7 +65,7 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     [Test]
     public async Task ToolAllScope_WithEmptyToolList_ReturnsEmpty()
     {
-        var result = _sut.FilterToolsWithStrategy([], ContextWithScopes("tool:all"));
+        var result = CreateSut(ContextWithScopes("tool:all")).FilterTools([]);
 
         await Assert.That(result.Count()).IsEqualTo(0);
     }
@@ -69,7 +73,7 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     [Test]
     public async Task SingleToolScope_ReturnsOnlyThatTool()
     {
-        var result = _sut.FilterToolsWithStrategy(AllTools, ContextWithScopes("tool:alpha")).ToList();
+        var result = CreateSut(ContextWithScopes("tool:alpha")).FilterTools(AllTools).ToList();
 
         await Assert.That(result.Count).IsEqualTo(1);
         await Assert.That(result[0].ProtocolTool.Name).IsEqualTo("alpha");
@@ -78,8 +82,7 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     [Test]
     public async Task MultipleToolScopes_ReturnsAllMatchedTools()
     {
-        var result = _sut.FilterToolsWithStrategy(
-            AllTools, ContextWithScopes("tool:alpha", "tool:gamma"));
+        var result = CreateSut(ContextWithScopes("tool:alpha", "tool:gamma")).FilterTools(AllTools);
 
         await Assert.That(ToolNames(result)).IsEquivalentTo(["alpha", "gamma"]);
     }
@@ -88,7 +91,7 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     public async Task ScopeWithoutToolPrefix_DoesNotMatchAnyTool()
     {
         // "alpha" ≠ "tool:alpha"
-        var result = _sut.FilterToolsWithStrategy(AllTools, ContextWithScopes("alpha"));
+        var result = CreateSut(ContextWithScopes("alpha")).FilterTools(AllTools);
 
         await Assert.That(result.Count()).IsEqualTo(0);
     }
@@ -96,7 +99,7 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     [Test]
     public async Task ToolScopeForUnknownTool_ReturnsNoTools()
     {
-        var result = _sut.FilterToolsWithStrategy(AllTools, ContextWithScopes("tool:does_not_exist"));
+        var result = CreateSut(ContextWithScopes("tool:does_not_exist")).FilterTools(AllTools);
 
         await Assert.That(result.Count()).IsEqualTo(0);
     }
@@ -105,8 +108,7 @@ public class ScopeToolsClaimsPrincipalToolSelectionStrategyTests
     public async Task MixedScopes_OnlyToolPrefixedOnesMatch()
     {
         // "openid" and "profile" are common OAuth scopes that must not leak tools
-        var result = _sut.FilterToolsWithStrategy(
-            AllTools, ContextWithScopes("openid", "profile", "tool:beta"));
+        var result = CreateSut(ContextWithScopes("openid", "profile", "tool:beta")).FilterTools(AllTools);
 
         await Assert.That(ToolNames(result)).IsEquivalentTo(["beta"]);
     }

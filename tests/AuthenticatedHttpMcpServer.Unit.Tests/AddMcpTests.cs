@@ -24,22 +24,35 @@ public class AddMcpTests
     }
 
     [Test]
-    public async Task AddMcp_RegistersToolSelectionStrategyAsSingleton()
+    public async Task AddMcp_RegistersBothToolSelectionStrategiesAsSingletons()
     {
-        var descriptor = CreateServicesWithMcp()
-            .FirstOrDefault(sd => sd.ServiceType == typeof(HttpContextToolSelectionStrategy));
+        var descriptors = CreateServicesWithMcp()
+            .Where(sd => sd.ServiceType == typeof(ToolSelectionStrategy))
+            .ToList();
 
-        await Assert.That(descriptor).IsNotNull();
-        await Assert.That(descriptor!.Lifetime).IsEqualTo(ServiceLifetime.Singleton);
+        await Assert.That(descriptors.Count).IsEqualTo(2);
+        await Assert.That(descriptors.All(d => d.Lifetime == ServiceLifetime.Singleton)).IsTrue();
     }
 
     [Test]
-    public async Task AddMcp_ToolSelectionStrategyImplementationIsScopeStrategy()
+    public async Task AddMcp_RegistersScopeToolsClaimsPrincipalStrategy()
     {
-        var descriptor = CreateServicesWithMcp()
-            .First(sd => sd.ServiceType == typeof(HttpContextToolSelectionStrategy));
+        var types = CreateServicesWithMcp()
+            .Where(sd => sd.ServiceType == typeof(ToolSelectionStrategy))
+            .Select(sd => sd.ImplementationType)
+            .ToList();
 
-        await Assert.That(descriptor.ImplementationType)
-            .IsEqualTo(typeof(ScopeToolsClaimsPrincipalToolSelectionStrategy));
+        await Assert.That(types).Contains(typeof(ScopeToolsClaimsPrincipalToolSelectionStrategy));
+    }
+
+    [Test]
+    public async Task AddMcp_RegistersToolsOptionsStrategy()
+    {
+        var types = CreateServicesWithMcp()
+            .Where(sd => sd.ServiceType == typeof(ToolSelectionStrategy))
+            .Select(sd => sd.ImplementationType)
+            .ToList();
+
+        await Assert.That(types).Contains(typeof(ToolsOptionsToolSelectionStrategy));
     }
 }

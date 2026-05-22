@@ -2,9 +2,7 @@ using ModelContextProtocol.Server;
 
 namespace AuthenticatedHttpMcpServer.Infrastructure.ToolSelection;
 
-public interface ToolSelectionStrategy<in T>
+public interface ToolSelectionStrategy
 {
-  IEnumerable<McpServerTool> FilterToolsWithStrategy(IReadOnlyCollection<McpServerTool> tools, T input);
+  IEnumerable<McpServerTool> FilterTools(IEnumerable<McpServerTool> tools);
 }
-
-public interface HttpContextToolSelectionStrategy : ToolSelectionStrategy<HttpContext>;

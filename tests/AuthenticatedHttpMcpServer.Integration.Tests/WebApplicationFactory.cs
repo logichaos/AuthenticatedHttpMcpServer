@@ -1,3 +1,4 @@
+using AuthenticatedHttpMcpServer.Infrastructure.ToolSelection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
@@ -36,5 +37,27 @@ public class TestWebApplicationFactory : TestWebApplicationFactory<Program>, IAs
                 .AddScheme<TestAuthHandlerOptions, TestAuthHandler>(
                     JwtBearerDefaults.AuthenticationScheme, _ => { });
         });
+    }
+}
+
+// AllowedTools = null → strategy passes all tools through.
+public class AllToolsWebApplicationFactory : TestWebApplicationFactory
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        base.ConfigureWebHost(builder);
+        builder.ConfigureTestServices(services =>
+            services.PostConfigure<ToolsSelectionOptions>(opts => opts.AllowedTools = null));
+    }
+}
+
+// AllowedTools = [] → strategy blocks all tools.
+public class EmptyAllowedToolsWebApplicationFactory : TestWebApplicationFactory
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        base.ConfigureWebHost(builder);
+        builder.ConfigureTestServices(services =>
+            services.PostConfigure<ToolsSelectionOptions>(opts => opts.AllowedTools = []));
     }
 }
