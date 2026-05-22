@@ -16,6 +16,7 @@ internal class SettingsModel
   public required FixedWindowRateLimiterOptions FixedWindowRateLimit { get; init; }
   public required HybridCacheEntryOptions Cache { get; init; }
   public ToolExposureSettings? ToolExposure { get; init; }
+  public string? ApiKey { get; init; }
   public EntraIdOptions? EntraId { get; set; }
   public ToolsSelectionOptions? ToolsSelection { get; set; }
 }

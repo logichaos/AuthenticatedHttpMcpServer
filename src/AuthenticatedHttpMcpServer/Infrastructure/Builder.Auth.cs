@@ -18,20 +18,29 @@ public static partial class ApiBuilder
         new OpenIdConnectConfigurationRetriever());
     }
 
-    services.AddAuthentication(Constants.Auth.Schemes.Bearer)
-      .AddScheme<JwtBearerAuthHandlerOptions, JwtBearerAuthHandler>(
-        Constants.Auth.Schemes.Bearer, opts =>
-        {
-          opts.ValidAudiences = GlobalConfigurations.ApiSettings?.TokenValidation.ValidAudiences;
-          opts.ValidIssuers = GlobalConfigurations.ApiSettings?.TokenValidation.ValidIssuers;
-          opts.RequireSignedTokens = !environment.IsDevelopment();
-          opts.OidcConfigurationManager = oidcConfigManager;
-        })
-      .AddScheme<ApiKeyAuthHandlerOptions, ApiKeyAuthHandler>(
-        Constants.Auth.Schemes.ApiKey, opts =>
-        {
-          opts.ValidateKey = key => key == "Lifetime Subscription";
-        });
+    var authBuilder = services.AddAuthentication(Constants.Auth.Schemes.Bearer);
+
+    authBuilder.AddScheme<JwtBearerAuthHandlerOptions, JwtBearerAuthHandler>(
+      Constants.Auth.Schemes.Bearer, opts =>
+      {
+        opts.ValidAudiences = GlobalConfigurations.ApiSettings?.TokenValidation.ValidAudiences;
+        opts.ValidIssuers = GlobalConfigurations.ApiSettings?.TokenValidation.ValidIssuers;
+        opts.RequireSignedTokens = !environment.IsDevelopment();
+        opts.OidcConfigurationManager = oidcConfigManager;
+      });
+
+    if (environment.IsDevelopment())
+    {
+      var devApiKey = GlobalConfigurations.ApiSettings?.ApiKey;
+      if (!string.IsNullOrWhiteSpace(devApiKey))
+      {
+        authBuilder.AddScheme<ApiKeyAuthHandlerOptions, ApiKeyAuthHandler>(
+          Constants.Auth.Schemes.ApiKey, opts =>
+          {
+            opts.ValidateKey = key => key == devApiKey;
+          });
+      }
+    }
 
     services.AddAuthorizationBuilder()
       .AddPolicy(Constants.Auth.Policies.MrAwesome, policy =>
