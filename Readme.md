@@ -1,5 +1,9 @@
 # AuthenticatedHttpMcpServer
 
+## OUTDATED!
+
+- After informing [erwinkramer](https://github.com/erwinkramer] that I would publish this repo with a lot of influence by his [bank-api](https://github.com/erwinkramer/bank-api). He didn't only tell me that it was ok, he also took time to review my code and gave me a lot of feedback that made me realize that I was doing it all wrong. So I decided to start from scratch again, incorporating the feedback that he gave me!
+
 ## tl;dr
 
 An Http MCP server with authentication and the ability to choose which tools are listed.
