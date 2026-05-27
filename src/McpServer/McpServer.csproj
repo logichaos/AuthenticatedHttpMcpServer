@@ -30,6 +30,10 @@
     <Description>An MCP server using the MCP C# SDK.</Description>-->
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="McpServer.Unit.Tests" />
+  </ItemGroup>
+
   <!-- Include additional files for browsing the MCP server. -->
   <ItemGroup>
     <None Include=".mcp\server.json" Pack="true" PackagePath="/.mcp/" />

@@ -1,5 +1,6 @@
 using Serilog;
 
+namespace McpServer.Infrastructure;
 public static partial class ApiBuilder
 {
     public static WebApplicationBuilder AddLogging(this WebApplicationBuilder builder)

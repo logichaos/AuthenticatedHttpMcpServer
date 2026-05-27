@@ -1,12 +1,16 @@
+using McpServer.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args)
     .AddLogging();
 
-builder.Services.AddMcp();
+builder.Services
+  .ConfigureRateLimiter(builder.Configuration)
+  .AddMcp();
 
 var app = builder.Build();
 
-app.UseLogging();
-
-app.UseMcp();
-app.MapGet("/", () => "this is working");
+app
+  .UseLogging()
+  .UseMcp()
+  .UseMaps();
 await app.RunAsync();

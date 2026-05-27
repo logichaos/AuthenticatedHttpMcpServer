@@ -1,3 +1,4 @@
+namespace McpServer.Infrastructure;
 public static partial class ApiBuilder
 {
   public static IServiceCollection AddMcp(this IServiceCollection services)
@@ -12,7 +13,8 @@ public static partial class ApiBuilder
   
   public static WebApplication UseMcp(this WebApplication app)
   {
-    app.MapMcp();
+    app.MapMcp()
+      .RequireRateLimiting(RateLimiterPolicyNames.McpRateLimits);
     return app;
   }
 }

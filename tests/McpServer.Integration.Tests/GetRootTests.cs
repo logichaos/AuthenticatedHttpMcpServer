@@ -1,6 +1,6 @@
 ﻿namespace McpServer.Integration.Tests;
 
-public class Tests
+public class GetRootTests
 {
   [ClassDataSource<WebApplicationFactory>(Shared = SharedType.PerTestSession)]
   public required WebApplicationFactory WebApplicationFactory { get; init; }
