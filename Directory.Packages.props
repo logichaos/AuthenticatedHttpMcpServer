@@ -5,4 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.8" />
+    <PackageVersion Include="ModelContextProtocol.AspNetCore" Version="1.3.0" />
+    <!-- Tests -->
+    <PackageVersion Include="TUnit" Version="1.45.29" />
+  </ItemGroup>
 </Project>
