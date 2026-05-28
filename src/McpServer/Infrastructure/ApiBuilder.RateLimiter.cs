@@ -14,12 +14,29 @@ public static class RateLimiterPolicyNames
 public class RateLimiterOptions
 {
   public const string RateLimitOptionsSectionName = "RateLimiterOptions";
+
+  /// <summary>
+  /// When <c>false</c>, no rate limiter middleware or policies are registered.
+  /// Use this in test environments where rate limiting isn't under test.
+  /// </summary>
+  public bool Enabled { get; set; } = true;
+
   public FixedWindowRateLimiterOptions? FixedWindowRateLimit { get; set; }
   public FixedWindowRateLimiterOptions? McpWindowRateLimit { get; set; }
 }
 
 public static partial class ApiBuilder
 {
+  /// <summary>
+  /// Marker type registered in DI when rate limiting is configured.
+  /// </summary>
+  internal sealed class RateLimiterMarker;
+
+  /// <summary>
+  /// Checks whether rate limiting was configured for the given application instance.
+  /// </summary>
+  public static bool IsRateLimiterConfigured(this IServiceProvider services) =>
+      services.GetService<RateLimiterMarker>() is not null;
   public static IServiceCollection ConfigureRateLimiter(this IServiceCollection services, IConfiguration configuration)
   {
     var rateLimits = configuration
@@ -32,6 +49,9 @@ public static partial class ApiBuilder
 
   internal static IServiceCollection ConfigureRateLimiter(this IServiceCollection services, RateLimiterOptions rateLimits)
   {
+    if (!rateLimits.Enabled)
+      return services;
+
     var fixedRateLimit = rateLimits.FixedWindowRateLimit
       ?? throw new InvalidOperationException(
         $"{RateLimiterOptions.RateLimitOptionsSectionName}:FixedWindowRateLimit is required.");
@@ -49,6 +69,9 @@ public static partial class ApiBuilder
       options.AddPolicy(RateLimiterPolicyNames.Fixed, httpContext =>
         CreateFixedWindowPartition(httpContext, fixedRateLimit));
     });
+
+    // Register a marker so UseMaps/UseMcp can check if rate limiting is configured
+    services.AddSingleton(new RateLimiterMarker());
 
     return services;
   }

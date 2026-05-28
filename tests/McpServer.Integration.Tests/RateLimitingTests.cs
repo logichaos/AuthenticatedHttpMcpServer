@@ -4,8 +4,8 @@ namespace McpServer.Integration.Tests;
 
 public class RateLimitingTests
 {
-    [ClassDataSource<WebApplicationFactory>(Shared = SharedType.PerTestSession)]
-    public required WebApplicationFactory Factory { get; init; }
+    [ClassDataSource<McpRateLimitingWebApplicationFactory>(Shared = SharedType.PerTestSession)]
+    public required McpRateLimitingWebApplicationFactory Factory { get; init; }
 
     private const int FixedPermitLimit = 10; // Fixed policy from appsettings.Development.json
 

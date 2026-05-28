@@ -5,16 +5,14 @@ using TUnit.Core.Interfaces;
 namespace McpServer.Integration.Tests;
 
 /// <summary>
-/// Sets environment to "Testing" so appsettings.Testing.json overrides
-/// rate limits with low test-friendly values:
-///   McpWindowRateLimit:  PermitLimit = 10
-///   FixedWindowRateLimit: PermitLimit = 100
+/// Uses the "RateLimitTesting" environment: OAuth disabled, rate limiting
+/// enabled with 1-second windows so counters reset between tests.
 /// </summary>
 public class McpRateLimitingWebApplicationFactory : WebApplicationFactory<Program>, IAsyncInitializer
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment("RateLimitTesting");
     }
 
     public Task InitializeAsync()

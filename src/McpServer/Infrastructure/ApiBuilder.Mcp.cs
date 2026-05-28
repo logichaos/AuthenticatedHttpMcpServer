@@ -15,8 +15,19 @@ public static partial class ApiBuilder
   
   public static WebApplication UseMcp(this WebApplication app)
   {
-    app.MapMcp()
-      .RequireRateLimiting(RateLimiterPolicyNames.McpRateLimits);
+    var endpoint = app.MapMcp();
+
+    if (app.Services.IsOAuthConfigured())
+    {
+      endpoint.RequireAuthorization();
+      endpoint.RequireCors(McpCorsPolicyName);
+    }
+
+    if (app.Services.IsRateLimiterConfigured())
+    {
+      endpoint.RequireRateLimiting(RateLimiterPolicyNames.McpRateLimits);
+    }
+
     return app;
   }
 }

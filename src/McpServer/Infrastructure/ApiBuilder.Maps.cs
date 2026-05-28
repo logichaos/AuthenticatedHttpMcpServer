@@ -4,10 +4,14 @@ public static partial class ApiBuilder_Maps
 {
   public static WebApplication UseMaps(this WebApplication app)
   {
-    app.UseRateLimiter();
+    var rootEndpoint = app.MapGet("/", () => "this is working");
 
-    app.MapGet("/", () => "this is working")
-      .RequireRateLimiting(RateLimiterPolicyNames.Fixed);
+    if (app.Services.IsRateLimiterConfigured())
+    {
+      app.UseRateLimiter();
+      rootEndpoint.RequireRateLimiting(RateLimiterPolicyNames.Fixed);
+    }
+
     return app;
   }
 }
