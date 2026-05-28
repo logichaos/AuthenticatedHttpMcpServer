@@ -1,3 +1,5 @@
+using McpServer.Tools;
+
 namespace McpServer.Infrastructure;
 public static partial class ApiBuilder
 {
